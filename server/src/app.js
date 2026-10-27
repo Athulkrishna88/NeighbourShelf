@@ -47,10 +47,21 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/localities', localityRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 404 handler for unknown routes
-app.use((req, res, next) => {
-  res.status(404).json({ success: false, message: `Route not found: ${req.originalUrl}` });
-});
+// Serve React frontend static build in production
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientBuildPath));
+
+  // Catch-all: send React index.html for any non-API route (client-side routing)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+} else {
+  // 404 handler for unknown routes (development only)
+  app.use((req, res, next) => {
+    res.status(404).json({ success: false, message: `Route not found: ${req.originalUrl}` });
+  });
+}
 
 // Central error handler
 app.use(errorHandler);
