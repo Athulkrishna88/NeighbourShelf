@@ -16,15 +16,8 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // CORS configuration (NFR-2.5)
-const allowedOrigins = process.env.CLIENT_URL ? [process.env.CLIENT_URL] : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
 app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps, curl, postman)
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS policy: Not allowed by CORS'));
-  },
+  origin: true, // allow all origins (frontend hosted separately on Vercel)
   credentials: true
 }));
 
